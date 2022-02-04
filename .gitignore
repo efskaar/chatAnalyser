@@ -3,9 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# 
-/*
+# filter files and chat logs ignored
+/*/
 *.html
+1*.txt
 
 # C extensions
 *.so
