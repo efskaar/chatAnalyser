@@ -1,7 +1,7 @@
 # chatAnalyser
  A chat analyzer for messenger chats. 
  
-#How to use this project:
+# How to use this project:
  In order to use this project you have to download your messenger chats from facebook
 
  Copy the project and open a chat-file with the Analyzer class
@@ -10,5 +10,5 @@
     -*Person* will systematicly count the parsed data from *Chat*
     - Afterwards the *Analyzer* will print out basic information about each Person in the chat-file
 
-#Dependencies:
+# Dependencies:
   BeautifulSoup
