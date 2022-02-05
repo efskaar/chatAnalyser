@@ -109,4 +109,40 @@ class Person():
       self.totalGivenReactions[r] += 1
     else:
       self.totalGivenReactions[r] = 1
+
+  def timeSendMessageDict(self):
+    timeDict = {key:0 for key in range(24)}
+    msgs = self.messages
+    for msg in msgs:
+      timeDict[int(msg['time'].split(':')[0])] +=1
+    return timeDict
+  
+  def dayOfWeekSendMessageDict(self):
+    mToInt = {'jan':1,'feb':2,'mar':3,
+              'apr':4,'mai':5,'jun':6,
+              'jul':7,'aug':8,'sep':9,
+              'okt':10,'nov':11,'des':12}
+    data = {'Sun':0,'Mon':0,
+            'Tue':0,'Wed':0,
+            'Thu':0,'Fri':0,
+            'Sat':0}
     
+    msgs = self.messages
+    for msg in msgs:
+      d,m,y = msg['date'].split('.')
+      d,m,y = int(d),mToInt[m.strip()],int(y)
+      data[self.dayOfWeek(d,m,y)] += 1
+    return data
+    
+  def dayOfWeek(self,d,m,y):
+    days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    anchorDate = [None,-4,0,0,-3,-5,-1,-3,-6,-2,-4,0,-2]
+    leapYearMonth = 1 if y%4==0 and y%100==0 and y%400==0 and m<3 else 0
+    diffAnchorDay = (d-anchorDate[m])-leapYearMonth
+    dayOfWeek = int((diffAnchorDay+self.basisDayThatYear(y))%7)
+    return days[dayOfWeek]
+
+  def basisDayThatYear(self,setYear):
+      nrLeapYear = ((setYear-setYear%4)/4)-((setYear-setYear%100)/100)+((setYear-setYear%400)/400)
+      dayThatYear = setYear + nrLeapYear + 2
+      return dayThatYear%7
