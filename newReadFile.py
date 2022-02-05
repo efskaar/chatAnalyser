@@ -1,91 +1,74 @@
+from bs4 import BeautifulSoup
+from newPerson import Person
 
 class ReadChatFile():
   def __init__(self):
-      self.people = []
+      self.people = {}
       self.chatName = ''
       self.messages = []
       self.reactionCount = -1
-
-  def divWithClass(self,text,className):
-    endDiv = '</div>'
-    classTag = f'<div class={className}>'
-    classContent = (text.split(classTag)[1].split(endDiv)[0])
-    return classContent
+      self.chatNameC = '_3b0d'
+      self.peopleC = '_2lek'
+      self.msgDivC = '_3-96 _2let'
+      self.dateTimeC = '_3-94 _2lem'
+      self.senderC = '_3-96 _2pio _2lek _2lel'
+      self.msgContainer = 'pam _3-95 _2pi0 _2lej uiBoxWhite noborder'
 
   def fetchChatName(self,text):
-    chatNameClass = '"_3b0d"'
-    chatName = self.divWithClass(text,chatNameClass)
-    self.chatName = chatName
+    chatName = self.soup.find_all("div", {"class": self.chatNameC})
+    self.chatName = chatName[0].contents[0]
 
   def fetchPeopleInChat(self,text):
-    peopleClass = '"_2lek"'
-    people = self.divWithClass(text,peopleClass)
+    people = self.soup.find_all("div", {"class": self.peopleC})
+    people = people[0].contents[0]
     #strip on ':', everything after is names
     #strip on ',', every name is seperated with , 
     people = people.split(':')[1].split(',')
     #temp solution --> og is norwegian, need a fix for later version
     people[-1],pNew = people[-1].split('og'); people.append(pNew)
     people = [p.strip() for p in people]
-    self.people = people
+    #Fix this so we go through the people list and see if its new people
+    for p in people:
+      self.people[p] = Person(p)
 
-  def fetchReactions(self,text):
-    reactionTag = '<ul class="_tqp">'
-    reactions = text.split(reactionTag)
-    if len(reactions)>1:
-      return [r[4::] for r in reactions[1].split('</li>')[:-1:]]
-    return []
-
-  def fetchMessageText(self,text):
-    # I HATE THESE LINES 
-    # might be some uncatched bugs in here
-    reactionTag = '<ul class="_tqp">'
-    messageClass = '"_3-96 _2let"'
-    dateAndTimeClass = '"_3-94 _2lem"'
-    temp = text.split(messageClass)[1][22::]
-    if len(temp.split(reactionTag)) > 1:
-      temp = temp.split(reactionTag)[0]
-    else:
-      temp = temp.split(dateAndTimeClass)[0][:-51:]
-    temp = temp.replace('<div>','')
-    temp = temp.replace('</div>','')
-    return temp
-
-  def fetchAllMessages(self,text):
-    #classNames for the html
-    dateAndTimeClass = '"_3-94 _2lem"'
-    senderClass = '"_3-96 _2pio _2lek _2lel"'
-
+  def fetchAllMessages(self,):
     #creating list of messages
-    messagesContainer = '"pam _3-95 _2pi0 _2lej uiBoxWhite noborder"'
-    classTag = f'<div class={messagesContainer}>'
-    messagesInChat = text.split(classTag)[2::]
-    
-    #fetching sender,reactions,date,time,text
-    for i in range(0,len(messagesInChat)):
-      reactions = self.fetchReactions(messagesInChat[i])
-      sender = self.divWithClass(messagesInChat[i],senderClass)
-      dateStamp, timeStamp = self.divWithClass(messagesInChat[i],dateAndTimeClass).split(',')
-      messageText = self.fetchMessageText(messagesInChat[i])
-    
-      #appending the new data structure for the message
-      self.messages.append({
+    msgs = self.soup.find_all("div", {"class": self.msgContainer})[1::]
+    #creating data structure for each messages
+    for i in range(len(msgs)):
+      m = msgs[i]
+      dateStamp,timeStamp = m.find_all('div',{"class": self.dateTimeC})[0].contents[0].split(',')
+      sender = m.find_all('div',{"class": self.senderC})[0].contents[0]
+      messageText = m.find_all('div',{"class": self.msgDivC})[0].contents[0]
+      stringifyMSG = str(messageText).replace('<div>','').replace('</div>','')
+      reactions = m.find_all('li')
+      if len(reactions) > 0:
+        reactions = [r.contents[0] for r in reactions]      
+ 
+      message = {
         'index':i,
+        'chat':self.chatName,
         'sender':sender,
         'date':dateStamp,
         'time':timeStamp,
-        'text':messageText,
+        'text':stringifyMSG,
         'reactions':reactions
-      })
+      }
+      #chat's message list
+      self.messages.append(message)
+      #persons own message list
+      self.people[sender].addMessage(message)
 
   def readFile(self,file):
     with open(file,'r',encoding='utf8') as infile:
       text = infile.read()
+      self.soup = BeautifulSoup(text, 'html.parser')
       #fetch chat name
       self.fetchChatName(text)
       #fetch people in chat
       self.fetchPeopleInChat(text)
       #fetch all messages
-      self.fetchAllMessages(text)
+      self.fetchAllMessages()
     print(self)
 
   def countReactions(self):
@@ -104,8 +87,6 @@ class ReadChatFile():
   def __str__(self):
     return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.people)} people'
 
-
 if '__main__' == __name__:
   rcf = ReadChatFile()
   rcf.readFile('tfn.html')
-  print(rcf)
