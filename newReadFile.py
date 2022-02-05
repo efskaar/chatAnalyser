@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from newPerson import Person
 
-class ReadChatFile():
+class Chat():
   def __init__(self):
       self.people = {}
       self.chatName = ''
@@ -14,6 +14,9 @@ class ReadChatFile():
       self.dateTimeC = '_3-94 _2lem'
       self.senderC = '_3-96 _2pio _2lek _2lel'
       self.msgContainer = 'pam _3-95 _2pi0 _2lej uiBoxWhite noborder'
+
+  def getPeopleInChat(self):
+    return list(self.people.keys())
 
   def fetchChatName(self,text):
     chatName = self.soup.find_all("div", {"class": self.chatNameC})
@@ -61,6 +64,7 @@ class ReadChatFile():
 
       message = {
         'index':i,
+        'chatObj': self,
         'chat':self.chatName,
         'sender':sender,
         'date':dateStamp,
@@ -69,7 +73,7 @@ class ReadChatFile():
         'reactions':reactions,
         'links':links,
         'images':imgs,
-        'files':None, #coming in the future
+        'files':[], #coming in the future
       }
       #chat's message list
       self.messages.append(message)
@@ -105,6 +109,21 @@ class ReadChatFile():
     return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.people)} people'
 
 if '__main__' == __name__:
-  rcf = ReadChatFile()
+  rcf = Chat()
   rcf.readFile('tfn.html')
   people = rcf.people
+  summen = 0
+  for name in people.keys():
+    # print('\n\n',name)
+    p = people[name]
+    words = p.words
+    # words = {k: v for k, v in sorted(p.words.items(), key=lambda item: item[1])}
+    # for word in words:
+    #   print(word,words[word])
+    print('\n',name)
+    print(f'{len(p.messages)} messages with {sum(words.values())} words')
+    print(f'On average {sum(words.values())/len(p.messages):.0f} words per message')
+    print('Received',sum(p.totalReactions.values()),p.totalReactions)
+    print('Given',sum(p.totalGivenReactions.values()),p.totalGivenReactions)
+    summen += sum(p.totalReactions.values())
+    
