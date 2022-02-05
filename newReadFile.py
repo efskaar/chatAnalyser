@@ -7,8 +7,9 @@ class ReadChatFile():
       self.chatName = ''
       self.messages = []
       self.reactionCount = -1
-      self.chatNameC = '_3b0d'
       self.peopleC = '_2lek'
+      self.chatNameC = '_3b0d'
+      self.reactonUlTag = '_tqp'
       self.msgDivC = '_3-96 _2let'
       self.dateTimeC = '_3-94 _2lem'
       self.senderC = '_3-96 _2pio _2lek _2lel'
@@ -31,6 +32,11 @@ class ReadChatFile():
     for p in people:
       self.people[p] = Person(p)
 
+  def removeFromString(self,text,listsOfEle):
+    for ele in listsOfEle:
+        text = text.replace(str(ele),'')
+    return text
+
   def fetchAllMessages(self,):
     #creating list of messages
     msgs = self.soup.find_all("div", {"class": self.msgContainer})[1::]
@@ -41,10 +47,18 @@ class ReadChatFile():
       sender = m.find_all('div',{"class": self.senderC})[0].contents[0]
       messageText = m.find_all('div',{"class": self.msgDivC})[0].contents[0]
       stringifyMSG = str(messageText).replace('<div>','').replace('</div>','')
+      
+      imgs = m.find_all('img')
       reactions = m.find_all('li')
-      if len(reactions) > 0:
-        reactions = [r.contents[0] for r in reactions]      
- 
+      aelements = m.find_all('a')
+      reactionUl = m.find_all('ul',{"class":self.reactonUlTag})
+      stringifyMSG = self.removeFromString(stringifyMSG,aelements)
+      stringifyMSG = self.removeFromString(stringifyMSG,reactionUl)
+      
+      imgs = [str(img) for img in imgs]   
+      reactions = [str(r.contents[0]) for r in reactions]      
+      links = [str(link.contents[0]) for link in aelements] 
+
       message = {
         'index':i,
         'chat':self.chatName,
@@ -52,7 +66,10 @@ class ReadChatFile():
         'date':dateStamp,
         'time':timeStamp,
         'text':stringifyMSG,
-        'reactions':reactions
+        'reactions':reactions,
+        'links':links,
+        'images':imgs,
+        'files':None, #coming in the future
       }
       #chat's message list
       self.messages.append(message)
@@ -90,3 +107,4 @@ class ReadChatFile():
 if '__main__' == __name__:
   rcf = ReadChatFile()
   rcf.readFile('tfn.html')
+  people = rcf.people
