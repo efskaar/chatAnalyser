@@ -78,10 +78,22 @@ class Person():
     else:
       self.totalReactions[r] = 1
 
+
+  
+
+
+
+  
   def addGivenReaction(self,name,r):
     self.addGivenReactionToName(name,r)
     self.addTotalGivenReaction(r)
   
+  '''
+  ***************************************
+  helper functions for reactions given counting
+  ***************************************
+  '''
+
   def addGivenReactionToName(self,name,r):
     if name in self.givenReactions.keys():
       if r in self.givenReactions[name].keys():
