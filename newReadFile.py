@@ -6,6 +6,7 @@ class ReadChatFile():
       self.people = []
       self.chatName = ''
       self.messages = []
+      self.reactionCount = -1
 
   def divWithClass(self,text,className):
     endDiv = '</div>'
@@ -89,13 +90,21 @@ class ReadChatFile():
       self.fetchAllMessages(text)
     print(self)
 
+  def countReactions(self):
+    if self.reactionCount == -1:
+      counter = 0
+      for m in self.messages:
+        counter += len(m['reactions'])
+      self.reactionCount = counter
+    return self.reactionCount
+
   def printMessages(self):
     for m in self.messages:
         print('\n\n')
         print(m['text'])
 
   def __str__(self):
-    return f'{self.chatName} consists of {len(self.messages)} messages between {len(self.people)} people'
+    return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.people)} people'
 
 
 if '__main__' == __name__:
