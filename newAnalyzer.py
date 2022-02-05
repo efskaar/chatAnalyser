@@ -20,6 +20,23 @@ class Analyser():
     reactionsDict = {k: v for k, v in sorted(reactionsDict.items(), key=lambda item: item[1])}
     return reactionsDict
 
+  def plotDictData(self,func,name):
+    self.grapher.makePlot(func(),name)
+
+  def plotEmojisGivenPerPerson(self):
+    people = self.rcf.people
+    for key in people.keys():
+      p = people[key]
+      filename = f'{p}-given-'
+      self.grapher.makePlot(p.totalGivenReactions,filename,path='reactions\\')
+
+  def plotEmojisReceivedPerPerson(self):
+    people = self.rcf.people
+    for key in people.keys():
+      p = people[key]
+      filename = f'{p}-gotten-'
+      self.grapher.makePlot(p.totalReactions,filename,path='reactions\\')
+
   def printBasicInfo(self):
     people = self.rcf.people
     summen = 0
@@ -36,5 +53,8 @@ class Analyser():
     print(self.totalReactionsInChat())
 
 if '__main__' == __name__:
-  analyser = Analyser('tfn.html')
-  analyser.printBasicInfo()
+  analyzer = Analyser('tfn.html')
+  analyzer.plotDictData(analyzer.totalReactionsInChat,"emojis")
+  analyzer.plotEmojisGivenPerPerson()
+  analyzer.plotEmojisReceivedPerPerson()
+  analyzer.printBasicInfo()
