@@ -43,8 +43,8 @@ class Grapher():
       xEnd = ((1+i)*w) 
       yEnd = value/maxValue
       ax.add_artist(Rectangle((xStart,yStart),w-0.5,yEnd,linewidth=3,fill=True,color=self.goodColors[i]))
-      text(xEnd+0.3,yEnd+0.05,f'{value}',rotation=0,fontsize=25,ha="center",va="center",fontname='Segoe UI Emoji',fontweight="bold")
-      text(xEnd+0.3,-0.1,f'{key}',rotation=0,fontsize=30,ha="center",va="center",fontname='Segoe UI Emoji')
+      text(xEnd+0.3,yEnd+0.05,f'{value}',rotation=0,fontsize=25,color=self.goodColors[i],ha="center",va="center",fontname='Segoe UI Emoji',fontweight="bold")
+      text(xEnd+0.3,-0.1,f'{key}',rotation=0,fontsize=30,color=self.goodColors[i],ha="center",va="center",fontname='Segoe UI Emoji')
     xlim([0,length*w+w])
     ylim([-0.2,1.2])
     subplots_adjust(left=0,right=1, top=1, bottom=0.0) 
