@@ -1,5 +1,3 @@
-from email import message
-
 
 class ReadChatFile():
   def __init__(self):
