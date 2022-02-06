@@ -11,8 +11,8 @@ class Analyser():
   def totalReactionsInChat(self):
     '''
     Creates a bar plot:
-      Y-axis: Frequency
       X-axis: Emojis
+      Y-axis: Frequency 
     
     Args:
       None
@@ -38,8 +38,8 @@ class Analyser():
   def plotEmojisGivenPerPerson(self):
     '''
     Creates a bar plot per person for emojis given:
-      Y-axis: Frequency
-      X-axis: Emojis 
+      X-axis: Emojis
+      Y-axis: Frequency 
     
     Args:
       None
@@ -57,8 +57,8 @@ class Analyser():
   def plotEmojisReceivedPerPerson(self):
     '''
     Creates a bar plot per person for emojis received:
-      Y-axis: Frequency 
       X-axis: Emojis
+      Y-axis: Frequency 
     
     Args:
       None
@@ -76,8 +76,8 @@ class Analyser():
   def plotSendTimePerPerson(self):
     '''
     Creates a bar plot per person:
-      Y-axis: Hour of the day
-      X-axis: Frequency 
+      X-axis: Hour of the day
+      Y-axis: Frequency 
     
     Args:
       None
@@ -97,8 +97,8 @@ class Analyser():
   def plotSendDayOfWeekPerPerson(self):
     '''
     Creates a bar plot per person:
-      Y-axis: Day of week
-      X-axis: Frequency 
+      X-axis: Day of week
+      Y-axis: Frequency 
     One plot per person
     
     Args:
@@ -118,8 +118,8 @@ class Analyser():
   def plotSendTime(self):
     '''
     Creates a bar for the whole chat:
-      Y-axis: Hour of the day
-      X-axis: Frequency 
+      X-axis: Hour of the day
+      Y-axis: Frequency 
     
     Args:
       None
@@ -141,8 +141,8 @@ class Analyser():
   def plotSendDayOfWeek(self):
     '''
     Creates a bar for the whole chat:
-      Y-axis: Day of week
-      X-axis: Frequency 
+      X-axis: Day of week
+      Y-axis: Frequency 
     One plot per person
     
     Args:
