@@ -110,5 +110,5 @@ class Analyser():
       self.makeDir(chatName+'/'+str(p))
 
 if '__main__' == __name__:
-  analyzer = Analyser('thelp.html')
+  analyzer = Analyser('tbs.html')
   analyzer.fullAnalysisAndDataCreation()
