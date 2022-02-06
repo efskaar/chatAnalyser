@@ -1,4 +1,3 @@
--day of week for whole chat
 -month bar plot for whole chat
 -month bar plot per person
 -year bar plot per person
@@ -9,5 +8,6 @@
 
 
 advanced:
+  count emojis in the message text
   multiple chats wiht multiple people at the same timeline
   single person chats 
