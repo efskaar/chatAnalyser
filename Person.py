@@ -127,7 +127,8 @@ class Person():
     timeDict = {key:0 for key in range(24)}
     msgs = self.messages
     for msg in msgs:
-      timeDict[int(msg['time'].split(':')[0])] +=1
+      correction = int('pm' in msg['time'])*11
+      timeDict[int(msg['time'].split(':')[0])+(correction)] +=1
     return timeDict
   
   def dayOfWeekSendMessageDict(self):
@@ -147,9 +148,9 @@ class Person():
 
     #dict for conversion between month name and number
     mToInt = {'jan':1,'feb':2,'mar':3,
-              'apr':4,'mai':5,'jun':6,
+              'apr':4,'mai':5,'may':5,'jun':6,
               'jul':7,'aug':8,'sep':9,
-              'okt':10,'nov':11,'des':12}
+              'okt':10,'oct':10,'nov':11,'des':12,'dec':12}
     #counts different 
     data = {'Mon':0,
             'Tue':0,'Wed':0,

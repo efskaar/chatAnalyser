@@ -84,7 +84,7 @@ class Analyser():
     self.plotEmojisReceivedPerPerson()
     self.plotSendDayOfWeekPerPerson()
     self.plotSendTimePerPerson()
-    # self.printBasicInfo()
+    self.printBasicInfo()
 
   def sortDict(self,data,isValue=True):
     return {k: v for k, v in sorted(data.items(), key=lambda item: item[isValue])}
@@ -110,5 +110,5 @@ class Analyser():
       self.makeDir(chatName+'/'+str(p))
 
 if '__main__' == __name__:
-  analyzer = Analyser('tfn.html')
+  analyzer = Analyser('thelp.html')
   analyzer.fullAnalysisAndDataCreation()

@@ -1,3 +1,4 @@
+from sqlite3 import Timestamp
 from bs4 import BeautifulSoup
 from Person import Person
 
@@ -29,7 +30,8 @@ class Chat():
     #strip on ',', every name is seperated with , 
     people = people.split(':')[1].split(',')
     #temp solution --> og is norwegian, need a fix for later version
-    people[-1],pNew = people[-1].split('og'); people.append(pNew)
+    #depends on your settings, language updated to english, thus and
+    people[-1],pNew = people[-1].split(' and '); people.append(pNew)
     people = [p.strip() for p in people]
     #Fix this so we go through the people list and see if its new people
     for p in people:
@@ -47,6 +49,13 @@ class Chat():
     for i in range(len(msgs)):
       m = msgs[i]
       dateStamp,timeStamp = m.find_all('div',{"class": self.dateTimeC})[0].contents[0].split(',')
+      
+      #quick fix for english version
+      year,timeStamp = timeStamp.strip().split(' ')
+      month,day = dateStamp.split(' ')
+      dateStamp = f'{day}.{month.lower()}.{year}'
+
+      #who sent and what did they send
       sender = m.find_all('div',{"class": self.senderC})[0].contents[0]
       messageText = m.find_all('div',{"class": self.msgDivC})[0].contents[0]
       stringifyMSG = str(messageText).replace('<div>','').replace('</div>','')
@@ -59,8 +68,13 @@ class Chat():
       stringifyMSG = self.removeFromString(stringifyMSG,reactionUl)
       
       imgs = [str(img) for img in imgs]   
-      reactions = [str(r.contents[0]) for r in reactions]      
-      links = [str(link.contents[0]) for link in aelements] 
+      reactions = [str(r.contents[0]) for r in reactions]     
+
+      #it is possible for a link to have a empty innerHTML -.- 
+      links = []
+      for link in aelements:
+        if len(link.contents)>0:
+          links.append(str(link.contents[0]))
 
       message = {
         'index':i,
