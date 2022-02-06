@@ -1,0 +1,13 @@
+-day of week for whole chat
+-month bar plot for whole chat
+-month bar plot per person
+-year bar plot per person
+-year bar plot whole chat
+-timeline for the chat
+-timeline for messages
+-timeline for words
+
+
+advanced:
+  multiple chats wiht multiple people at the same timeline
+  single person chats 
