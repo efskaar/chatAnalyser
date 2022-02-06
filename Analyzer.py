@@ -9,6 +9,17 @@ class Analyser():
     self.grapher = Grapher()
 
   def totalReactionsInChat(self):
+    '''
+    Creates a bar plot:
+      Y-axis: Frequency
+      X-axis: Emojis
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
     people = self.rcf.people
     reactionsDict = {}
     for name in people.keys():
@@ -25,6 +36,17 @@ class Analyser():
     self.grapher.makePlot(func(),name,path=self.rcf.chatName+'/')
 
   def plotEmojisGivenPerPerson(self):
+    '''
+    Creates a bar plot per person for emojis given:
+      Y-axis: Frequency
+      X-axis: Emojis 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
     people = self.rcf.people
     chatName = self.rcf.chatName
     for key in people.keys():
@@ -33,6 +55,17 @@ class Analyser():
       self.grapher.makePlot(self.sortDict(p.totalGivenReactions),filename)
 
   def plotEmojisReceivedPerPerson(self):
+    '''
+    Creates a bar plot per person for emojis received:
+      Y-axis: Frequency 
+      X-axis: Emojis
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
     people = self.rcf.people
     chatName = self.rcf.chatName
     for key in people.keys():
@@ -41,6 +74,17 @@ class Analyser():
       self.grapher.makePlot(self.sortDict(p.totalReactions),filename)
   
   def plotSendTimePerPerson(self):
+    '''
+    Creates a bar plot per person:
+      Y-axis: Hour of the day
+      X-axis: Frequency 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
     people = self.rcf.people
     chatName = self.rcf.chatName
     for key in people.keys():
@@ -51,6 +95,18 @@ class Analyser():
       self.grapher.makePlot(data,filename)
 
   def plotSendDayOfWeekPerPerson(self):
+    '''
+    Creates a bar plot per person:
+      Y-axis: Day of week
+      X-axis: Frequency 
+    One plot per person
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
     people = self.rcf.people
     chatName = self.rcf.chatName
     for key in people.keys():
@@ -59,7 +115,70 @@ class Analyser():
       filename = f'{chatName}/{p}/sent-dayWeek'
       self.grapher.makePlot(data,filename)
 
+  def plotSendTime(self):
+    '''
+    Creates a bar for the whole chat:
+      Y-axis: Hour of the day
+      X-axis: Frequency 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
+    people = self.rcf.people
+    chatName = self.rcf.chatName
+    data = {key:0 for key in range(24)}
+    for key in people.keys():
+      p = people[key]
+      newData = p.timeSendMessageDict()
+      for key in data.keys():
+        data[key] += newData[key]
+    filename = f'{chatName}/sent-time'
+    self.grapher.makePlot(data,filename)
+
+  def plotSendDayOfWeek(self):
+    '''
+    Creates a bar for the whole chat:
+      Y-axis: Day of week
+      X-axis: Frequency 
+    One plot per person
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
+    people = self.rcf.people
+    chatName = self.rcf.chatName
+    data = {'Mon':0,
+            'Tue':0,'Wed':0,
+            'Thu':0,'Fri':0,
+            'Sat':0,'Sun':0,}
+    for key in people.keys():
+      p = people[key]
+      newData = p.dayOfWeekSendMessageDict()
+      for key in data.keys():
+        data[key] += newData[key]
+    filename = f'{chatName}/sent-dayWeek'
+    self.grapher.makePlot(data,filename)
+
+
   def printBasicInfo(self):
+    '''
+    Prints basic info to the terminal
+    Words per message
+    Messages - Words 
+    And the reaction dictionaries are printed
+    
+    Args:
+      None
+
+    Returns:
+      None
+    '''
     people = self.rcf.people
     summen = 0
     for name in people.keys():
@@ -77,21 +196,56 @@ class Analyser():
   def fullAnalysisAndDataCreation(self):
     '''
     In case you want a full analysis of the chat
+
+    Args: 
+      None
+
+    Returns:
+      None
     '''
     self.makeNecessaryDirs()
-    self.plotDictData(self.totalReactionsInChat,"emojis")
-    self.plotEmojisGivenPerPerson()
-    self.plotEmojisReceivedPerPerson()
-    self.plotSendDayOfWeekPerPerson()
-    self.plotSendTimePerPerson()
-    self.printBasicInfo()
+    # self.plotDictData(self.totalReactionsInChat,"emojis")
+    self.plotSendDayOfWeek()
+    self.plotSendTime()
+    # self.plotEmojisGivenPerPerson()
+    # self.plotEmojisReceivedPerPerson()
+    # self.plotSendDayOfWeekPerPerson()
+    # self.plotSendTimePerPerson()
+    # self.printBasicInfo()
+
+
+
+
 
   def sortDict(self,data,isValue=True):
+    '''
+    Sorts a dictionary by value or key
+    Sort by value by default 
+
+    Args:
+      dict data       : dictionary that will be sorted
+      boolean isValue : default:True 
+          True  --> sort by value
+          False --> sort by key 
+    
+    returns:
+      dict            : sorted dictionary
+    '''
     return {k: v for k, v in sorted(data.items(), key=lambda item: item[isValue])}
+
+
+
+
 
   def makeDir(self,path):
     '''
     For making a directory
+    
+    Args: 
+      str path  : the path including the new dir
+    
+    Returns:
+      None 
     '''
     if not os.path.exists(path):
       os.mkdir(path)
@@ -102,6 +256,11 @@ class Analyser():
   def makeNecessaryDirs(self):
     '''
     Makes all necessary directories for the results files
+    
+    Args:
+      None
+    Return:
+      None
     '''
     people = self.rcf.people
     chatName = self.rcf.chatName
