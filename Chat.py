@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from newPerson import Person
+from Person import Person
 
 class Chat():
   def __init__(self):
