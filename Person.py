@@ -111,6 +111,19 @@ class Person():
       self.totalGivenReactions[r] = 1
 
   def timeSendMessageDict(self):
+    '''
+    For all messages:
+      extract time
+      extract hour part for that time
+    
+    parameters: 
+      None
+
+    Return:
+      dict
+        int key     : hour - 0 ... 23
+        int value   : number of times a msg was sent at that hour of the day
+    '''
     timeDict = {key:0 for key in range(24)}
     msgs = self.messages
     for msg in msgs:
@@ -118,14 +131,30 @@ class Person():
     return timeDict
   
   def dayOfWeekSendMessageDict(self):
+    '''
+    For all messages:
+      extract date
+      find the day of the week for that date
+    
+    parameters: 
+      None
+
+    Return:
+      dict
+        string key  : first three letter of a day
+        int value   : number of times a msg was sent on that day
+    '''
+
+    #dict for conversion between month name and number
     mToInt = {'jan':1,'feb':2,'mar':3,
               'apr':4,'mai':5,'jun':6,
               'jul':7,'aug':8,'sep':9,
               'okt':10,'nov':11,'des':12}
-    data = {'Sun':0,'Mon':0,
+    #counts different 
+    data = {'Mon':0,
             'Tue':0,'Wed':0,
             'Thu':0,'Fri':0,
-            'Sat':0}
+            'Sat':0,'Sun':0,}
     
     msgs = self.messages
     for msg in msgs:
@@ -135,6 +164,17 @@ class Person():
     return data
     
   def dayOfWeek(self,d,m,y):
+    '''
+    Calculates the day of the week a given date is
+
+    parameters:
+      int d - day   1-31
+      int m - month 1-12
+      int y - year  1-xxxx
+    
+    return: 
+      string day : three first letters for the day
+    '''
     days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
     anchorDate = [None,-4,0,0,-3,-5,-1,-3,-6,-2,-4,0,-2]
     leapYearMonth = 1 if y%4==0 and y%100==0 and y%400==0 and m<3 else 0
@@ -143,6 +183,15 @@ class Person():
     return days[dayOfWeek]
 
   def basisDayThatYear(self,setYear):
+      '''
+      Finds the anchor day of the week for that given year
+      
+      parameters:
+        int setYear
+
+      return:
+        int basisDay: 0 for sun ... 6 for sat
+      '''
       nrLeapYear = ((setYear-setYear%4)/4)-((setYear-setYear%100)/100)+((setYear-setYear%400)/400)
       dayThatYear = setYear + nrLeapYear + 2
       return dayThatYear%7
