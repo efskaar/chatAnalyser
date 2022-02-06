@@ -116,7 +116,7 @@ class Person():
       extract time
       extract hour part for that time
     
-    parameters: 
+    Args: 
       None
 
     Return:
@@ -137,7 +137,7 @@ class Person():
       extract date
       find the day of the week for that date
     
-    parameters: 
+    Args: 
       None
 
     Return:
@@ -168,13 +168,13 @@ class Person():
     '''
     Calculates the day of the week a given date is
 
-    parameters:
+    Args:
       int d - day   1-31
       int m - month 1-12
       int y - year  1-xxxx
     
     return: 
-      string day : three first letters for the day
+      string : three first letters for the day
     '''
     days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
     anchorDate = [None,-4,0,0,-3,-5,-1,-3,-6,-2,-4,0,-2]
@@ -187,11 +187,11 @@ class Person():
       '''
       Finds the anchor day of the week for that given year
       
-      parameters:
-        int setYear
+      Args:
+        int setYear: year from a date
 
       return:
-        int basisDay: 0 for sun ... 6 for sat
+        int : 0 for sun ... 6 for sat
       '''
       nrLeapYear = ((setYear-setYear%4)/4)-((setYear-setYear%100)/100)+((setYear-setYear%400)/400)
       dayThatYear = setYear + nrLeapYear + 2
