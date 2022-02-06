@@ -8,7 +8,9 @@
   * **Analyzer** will send the file to **Chat**
   * **Chat** will parse the HTML data and send the parsed data to the person class
   * **Person** will systematicly count the parsed data from **Chat**
-  * Afterwards the *Analyzer* will print out basic information about each Person in the chat-file
+  * **Analyzer** can fetch data from **Person** and send it systematically to **Grapher**
+  * **Grapher** can make bar plots of dict data
+    * **Grapher** will be updated with further functionality in the future 
 
 # Dependencies:
   BeautifulSoup
