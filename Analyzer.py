@@ -1,5 +1,5 @@
-from newReadFile import Chat
-from newGrapher import Grapher
+from Chat import Chat
+from Grapher import Grapher
 import os
 
 class Analyser():
