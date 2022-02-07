@@ -1,4 +1,3 @@
-from sqlite3 import Timestamp
 from bs4 import BeautifulSoup
 from Person import Person
 
