@@ -205,12 +205,12 @@ class Analyser():
     '''
     self.makeNecessaryDirs()
     # self.plotDictData(self.totalReactionsInChat,"emojis")
-    self.plotSendDayOfWeek()
-    self.plotSendTime()
+    # self.plotSendDayOfWeek()
+    # self.plotSendTime()
     # self.plotEmojisGivenPerPerson()
     # self.plotEmojisReceivedPerPerson()
     # self.plotSendDayOfWeekPerPerson()
-    # self.plotSendTimePerPerson()
+    self.plotSendTimePerPerson()
     # self.printBasicInfo()
 
 
