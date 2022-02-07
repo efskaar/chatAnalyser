@@ -127,8 +127,15 @@ class Person():
     timeDict = {key:0 for key in range(24)}
     msgs = self.messages
     for msg in msgs:
-      correction = int('pm' in msg['time'])*11
-      timeDict[int(msg['time'].split(':')[0])+(correction)] +=1
+      h,m,s = msg['time'].split(':')
+      if '12' in h:
+        if 'pm' in s:
+          s = s.replace('p','a')
+        else:
+          s = s.replace('a','p')
+      h = int(h)
+      correction = int('pm' in s)*12
+      timeDict[(h+correction)%24] +=1
     return timeDict
   
   def dayOfWeekSendMessageDict(self):
