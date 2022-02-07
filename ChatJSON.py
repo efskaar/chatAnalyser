@@ -1,4 +1,5 @@
-from bs4 import BeautifulSoup
+from calendar import formatstring
+import datetime,emoji,json
 from Person import Person
 
 class Chat():
@@ -18,32 +19,12 @@ class Chat():
   def getPeopleInChat(self):
     return list(self.people.keys())
 
-  def fetchChatName(self,text):
-    chatName = self.soup.find_all("div", {"class": self.chatNameC})
-    self.chatName = chatName[0].contents[0]
+  def fetchPeopleInChat(self,participants):
+    for p in participants:
+      name = formatstring(p['name'])
+      self.people[name] = Person(name)
 
-  def fetchPeopleInChat(self,text):
-    people = self.soup.find_all("div", {"class": self.peopleC})
-    people = people[0].contents[0]
-    #strip on ':', everything after is names
-    #strip on ',', every name is seperated with , 
-    people = people.split(':')[1].split(',')
-    #temp solution --> og is norwegian, need a fix for later version
-    #depends on your settings, language updated to english, thus and
-    people[-1],pNew = people[-1].split(' and '); people.append(pNew)
-    people = [p.strip() for p in people]
-    #Fix this so we go through the people list and see if its new people
-    for p in people:
-      self.people[p] = Person(p)
-
-  def removeFromString(self,text,listsOfEle):
-    for ele in listsOfEle:
-        text = text.replace(str(ele),'')
-    return text
-
-  def fetchAllMessages(self,):
-    #creating list of messages
-    msgs = self.soup.find_all("div", {"class": self.msgContainer})[1::]
+  def fetchAllMessages(self,msgs):
     #creating data structure for each messages
     for i in range(len(msgs)):
       m = msgs[i]
@@ -93,16 +74,17 @@ class Chat():
       #persons own message list
       self.people[sender].addMessage(message)
 
+  def formatString(self,text):
+    return text.encode("latin_1").decode("utf_8")
+
   def readFile(self,file):
-    with open(file,'r',encoding='utf8') as infile:
-      text = infile.read()
-      self.soup = BeautifulSoup(text, 'html.parser')
-      #fetch chat name
-      self.fetchChatName(text)
-      #fetch people in chat
-      self.fetchPeopleInChat(text)
-      #fetch all messages
-      self.fetchAllMessages()
+    with open(file,'r', encoding='utf-8') as infile:
+      #keys: participants, messages, title, is_still_participant, 
+      #                   thread_type, thread_path, magic_words
+      data = json.load(infile)
+      self.chatName = self.formatString(data['title'])
+      self.fetchPeopleInChat(data['participants'])
+      self.fetchAllMessages(data['messages'])
     print(self)
 
   def countReactions(self):
