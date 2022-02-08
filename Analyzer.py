@@ -252,7 +252,6 @@ class Analyser():
       newData = p.dayOfWeekSendMessageDict()
       for key in data.keys():
         data[key] += newData[key]
-    data = dic
     filename = f'{chatName}/sent-dayWeek'
     self.grapher.makePlot(data,filename)
 
@@ -295,18 +294,18 @@ class Analyser():
       None
     '''
     self.makeNecessaryDirs()
-    # self.plotDictData(self.totalReactionsInChat,"emojis")
-    # self.plotSendDayOfWeek()
-    # self.plotSendTime()
-    # self.plotEmojisPerPerson()
-    # self.plotEmojisGivenPerPerson()
-    # self.plotEmojisReceivedPerPerson()
-    # self.plotSendDayOfWeekPerPerson()
-    # self.plotSendTimePerPerson()
+    self.plotDictData(self.totalReactionsInChat,"emojis")
+    self.plotSendDayOfWeek()
+    self.plotSendTime()
+    self.plotEmojisPerPerson()
+    self.plotEmojisGivenPerPerson()
+    self.plotEmojisReceivedPerPerson()
+    self.plotSendDayOfWeekPerPerson()
+    self.plotSendTimePerPerson()
     self.plotMonthTimePerPerson()
     self.plotEmojisUsedTime()
     self.plotMonthTime()
-    # self.printBasicInfo()
+    self.printBasicInfo()
 
 
 
@@ -364,5 +363,5 @@ class Analyser():
       self.makeDir(chatName+'/'+str(p))
 
 if '__main__' == __name__:
-  analyzer = Analyser('tbs.json')
+  analyzer = Analyser('tfn.json')
   analyzer.fullAnalysisAndDataCreation()
