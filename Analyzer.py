@@ -1,4 +1,4 @@
-from Chat import Chat
+from ChatJSON import Chat
 from Grapher import Grapher
 import os
 
@@ -54,6 +54,26 @@ class Analyser():
       filename = f'{chatName}/{p}/given-emojis'
       self.grapher.makePlot(self.sortDict(p.totalGivenReactions),filename)
 
+  def plotEmojisPerPerson(self):
+    '''
+    Creates a bar plot per person for emojis given:
+      X-axis: Emojis
+      Y-axis: Frequency 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
+    people = self.rcf.people
+    chatName = self.rcf.chatName
+    for key in people.keys():
+      p = people[key]
+      filename = f'{chatName}/{p}/emojis'
+      self.grapher.makePlot(self.sortDict(p.totalEmojis),filename)
+
+
   def plotEmojisReceivedPerPerson(self):
     '''
     Creates a bar plot per person for emojis received:
@@ -92,6 +112,27 @@ class Analyser():
       data = p.timeSendMessageDict()
       data = self.sortDict(data,False)
       filename = f'{chatName}/{p}/sent-time'
+      self.grapher.makePlot(data,filename)
+  
+  def plotMonthTimePerPerson(self):
+    '''
+    Creates a bar plot per person:
+      X-axis: Hour of the day
+      Y-axis: Frequency 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
+    people = self.rcf.people
+    chatName = self.rcf.chatName
+    for key in people.keys():
+      p = people[key]
+      data = p.monthSendMessageDict()
+      data = self.sortDict(data,False)
+      filename = f'{chatName}/{p}/sent-month'
       self.grapher.makePlot(data,filename)
 
   def plotSendDayOfWeekPerPerson(self):
@@ -138,6 +179,55 @@ class Analyser():
     filename = f'{chatName}/sent-time'
     self.grapher.makePlot(data,filename)
 
+  def plotMonthTime(self):
+    '''
+    Creates a bar for the whole chat:
+      X-axis: Hour of the day
+      Y-axis: Frequency 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
+    people = self.rcf.people
+    chatName = self.rcf.chatName
+    data = {key:0 for key in range(1,13)}
+    for key in people.keys():
+      p = people[key]
+      newData = p.monthSendMessageDict()
+      for key in data.keys():
+        data[key] += newData[key]
+    filename = f'{chatName}/sent-month'
+    self.grapher.makePlot(data,filename)
+
+  def plotEmojisUsedTime(self):
+    '''
+    Creates a bar for the whole chat:
+      X-axis: Hour of the day
+      Y-axis: Frequency 
+    
+    Args:
+      None
+    
+    Returns: 
+      None
+    '''
+    people = self.rcf.people
+    chatName = self.rcf.chatName
+    data = {}
+    for key in people.keys():
+      p = people[key]
+      newData = p.totalEmojis
+      for key in newData.keys():
+        if key in data.keys():
+          data[key] += newData[key]
+        else:
+          data[key] = newData[key]
+    filename = f'{chatName}/emojis-used'
+    self.grapher.makePlot(self.sortDict(data),filename)
+
   def plotSendDayOfWeek(self):
     '''
     Creates a bar for the whole chat:
@@ -162,6 +252,7 @@ class Analyser():
       newData = p.dayOfWeekSendMessageDict()
       for key in data.keys():
         data[key] += newData[key]
+    data = dic
     filename = f'{chatName}/sent-dayWeek'
     self.grapher.makePlot(data,filename)
 
@@ -207,10 +298,14 @@ class Analyser():
     # self.plotDictData(self.totalReactionsInChat,"emojis")
     # self.plotSendDayOfWeek()
     # self.plotSendTime()
+    # self.plotEmojisPerPerson()
     # self.plotEmojisGivenPerPerson()
     # self.plotEmojisReceivedPerPerson()
     # self.plotSendDayOfWeekPerPerson()
-    self.plotSendTimePerPerson()
+    # self.plotSendTimePerPerson()
+    self.plotMonthTimePerPerson()
+    self.plotEmojisUsedTime()
+    self.plotMonthTime()
     # self.printBasicInfo()
 
 
@@ -269,5 +364,5 @@ class Analyser():
       self.makeDir(chatName+'/'+str(p))
 
 if '__main__' == __name__:
-  analyzer = Analyser('tbs.html')
+  analyzer = Analyser('tbs.json')
   analyzer.fullAnalysisAndDataCreation()
