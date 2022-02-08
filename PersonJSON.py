@@ -66,7 +66,7 @@ class Person():
       for reaction in reactions:
         name = reaction['actor']
         emoji = reaction['reaction']
-        chat.people[name].addGivenReaction(self.name,emoji)
+        chat.participants[name].addGivenReaction(self.name,emoji)
         self.addReactionToName(name,emoji)
         self.addTotalReaction(emoji)
 
