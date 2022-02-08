@@ -75,6 +75,52 @@ class Analyser():
   def dayOfWeek(self,p):
     return p.dayOfWeekSendMessageDict()
 
+  def sortDict(self,data,byValue=True):
+    '''
+    Sorts a dictionary by value or key
+    Sort by value by default 
+
+    Args:
+      dict data       : dictionary that will be sorted
+      boolean byValue : default:True 
+          True  --> sort by value
+          False --> sort by key 
+    
+    returns:
+      dict            : sorted dictionary
+    '''
+    return {k: v for k, v in sorted(data.items(), key=lambda item: item[byValue])}
+
+  def makeDir(self,path):
+    '''
+    For making a directory
+    
+    Args: 
+      str path  : the path including the new dir
+    
+    Returns:
+      None 
+    '''
+    if not os.path.exists(path):
+      os.mkdir(path)
+      print("Directory " , path ,  " Created ")
+    # else:    
+    #   print("Directory " , path ,  " already exists")
+  
+  def makeNecessaryDirs(self):
+    '''
+    Makes all necessary directories for the results files
+    Args:
+      None
+    Return:
+      None
+    '''
+    people = self.rcf.participants
+    chatName = self.rcf.chatName
+    self.makeDir(chatName)
+    for p in people:
+      self.makeDir(chatName+'/'+str(p))
+
   def printBasicInfo(self):
     '''
     Prints basic info to the terminal
@@ -101,7 +147,7 @@ class Analyser():
       summen += sum(p.totalReactions.values())
     print('\n\n\n')
     print(self.totalReactionsInChat())
-  
+
   def fullAnalysisAndDataCreation(self):
     '''
     In case you want a full analysis of the chat
@@ -126,53 +172,6 @@ class Analyser():
     self.plotDataPerPerson(self.sendTime,'msg-send-time')
     self.plotDataPerPerson(self.monthTime,'msg-per-month')
 
-  def sortDict(self,data,isValue=True):
-    '''
-    Sorts a dictionary by value or key
-    Sort by value by default 
-
-    Args:
-      dict data       : dictionary that will be sorted
-      boolean isValue : default:True 
-          True  --> sort by value
-          False --> sort by key 
-    
-    returns:
-      dict            : sorted dictionary
-    '''
-    return {k: v for k, v in sorted(data.items(), key=lambda item: item[isValue])}
-
-  def makeDir(self,path):
-    '''
-    For making a directory
-    
-    Args: 
-      str path  : the path including the new dir
-    
-    Returns:
-      None 
-    '''
-    if not os.path.exists(path):
-      os.mkdir(path)
-      print("Directory " , path ,  " Created ")
-    # else:    
-    #   print("Directory " , path ,  " already exists")
-  
-  def makeNecessaryDirs(self):
-    '''
-    Makes all necessary directories for the results files
-    
-    Args:
-      None
-    Return:
-      None
-    '''
-    people = self.rcf.participants
-    chatName = self.rcf.chatName
-    self.makeDir(chatName)
-    for p in people:
-      self.makeDir(chatName+'/'+str(p))
-
 if '__main__' == __name__:
-  analyzer = Analyser('tfn.json')
+  analyzer = Analyser('tbs.json')
   analyzer.fullAnalysisAndDataCreation()
