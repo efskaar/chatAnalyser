@@ -1,108 +1,98 @@
-from bs4 import BeautifulSoup
+import datetime,emoji,json
 from Person import Person
 
 class Chat():
   def __init__(self):
-      self.people = {}
+      self.participants = {}
       self.chatName = ''
       self.messages = []
       self.reactionCount = -1
-      self.peopleC = '_2lek'
-      self.chatNameC = '_3b0d'
-      self.reactonUlTag = '_tqp'
-      self.msgDivC = '_3-96 _2let'
-      self.dateTimeC = '_3-94 _2lem'
-      self.senderC = '_3-96 _2pio _2lek _2lel'
-      self.msgContainer = 'pam _3-95 _2pi0 _2lej uiBoxWhite noborder'
 
-  def getPeopleInChat(self):
-    return list(self.people.keys())
+  def fetchPeopleInChat(self,participants):
+    for p in participants:
+      name = self.formatString(p['name'])
+      self.participants[name] = Person(name)
 
-  def fetchChatName(self,text):
-    chatName = self.soup.find_all("div", {"class": self.chatNameC})
-    self.chatName = chatName[0].contents[0]
+  def fetchContentInMessage(self,msg):
+    tag = 'content'
+    if tag in msg.keys():
+      content = self.formatString(msg[tag])
+      contentEmojis = self.extract_emojis(content)
+    else:
+      content = ''
+      contentEmojis = ''
+    return content,contentEmojis
 
-  def fetchPeopleInChat(self,text):
-    people = self.soup.find_all("div", {"class": self.peopleC})
-    people = people[0].contents[0]
-    #strip on ':', everything after is names
-    #strip on ',', every name is seperated with , 
-    people = people.split(':')[1].split(',')
-    #temp solution --> og is norwegian, need a fix for later version
-    #depends on your settings, language updated to english, thus and
-    people[-1],pNew = people[-1].split(' and '); people.append(pNew)
-    people = [p.strip() for p in people]
-    #Fix this so we go through the people list and see if its new people
-    for p in people:
-      self.people[p] = Person(p)
+  def fetchReactionsInMessage(self,msg):
+    tag = 'reactions'
+    if tag in msg.keys():
+      for r in msg[tag]:
+        for key in r.keys():
+          r[key] = self.formatString(r[key])
+      return msg[tag]
+    else:
+      return []
+    
+  def fetchMediaInMessage(self,msg,tag):
+    return msg[tag] if tag in msg.keys() else []
 
-  def removeFromString(self,text,listsOfEle):
-    for ele in listsOfEle:
-        text = text.replace(str(ele),'')
-    return text
+  def fetchTimeAndDateInMessage(self,msg):
+    ms = msg['timestamp_ms']
+    dt = datetime.datetime.fromtimestamp(ms/1000.0)
+    return dt.date(),dt.time()
 
-  def fetchAllMessages(self,):
-    #creating list of messages
-    msgs = self.soup.find_all("div", {"class": self.msgContainer})[1::]
+  def fetchAllMessages(self,msgs):
     #creating data structure for each messages
-    for i in range(len(msgs)):
-      m = msgs[i]
-      dateStamp,timeStamp = m.find_all('div',{"class": self.dateTimeC})[0].contents[0].split(',')
-      
-      #quick fix for english version
-      year,timeStamp = timeStamp.strip().split(' ')
-      month,day = dateStamp.split(' ')
-      dateStamp = f'{day}.{month.lower()}.{year}'
+    i = 0
+    for msg in msgs:
+      if not msg['is_unsent']:
+        i += 1
+        date,time = self.fetchTimeAndDateInMessage(msg)
+        sender = self.formatString(msg['sender_name'])
+        photos = self.fetchMediaInMessage(msg,'photos')
+        gifs = self.fetchMediaInMessage(msg,'gifs')
+        sticker = self.fetchMediaInMessage(msg,'sticker')
+        videos = self.fetchMediaInMessage(msg,'videos')
+        files = self.fetchMediaInMessage(msg,'files')
+        reactions = self.fetchReactionsInMessage(msg)
+        content,contentEmojis = self.fetchContentInMessage(msg)  
+        links = []
+        message = {
+          'index':i,
+          'chatObj': self,
+          'chat':self.chatName,
+          'sender':sender,
+          'date':date,
+          'time':time,
+          'text':content,
+          'emojis':contentEmojis,
+          'reactions':reactions,
+          'images':photos,
+          'videos':videos,
+          'gifs':gifs,
+          'sticker':sticker,
+          'files':files, #came in the future :)
+          'links':links, #coming in the future
+        }
+        #chat's message list
+        self.messages.append(message)
+        #persons own message list
+        self.participants[sender].addMessage(message)
 
-      #who sent and what did they send
-      sender = m.find_all('div',{"class": self.senderC})[0].contents[0]
-      messageText = m.find_all('div',{"class": self.msgDivC})[0].contents[0]
-      stringifyMSG = str(messageText).replace('<div>','').replace('</div>','')
-      
-      imgs = m.find_all('img')
-      reactions = m.find_all('li')
-      aelements = m.find_all('a')
-      reactionUl = m.find_all('ul',{"class":self.reactonUlTag})
-      stringifyMSG = self.removeFromString(stringifyMSG,aelements)
-      stringifyMSG = self.removeFromString(stringifyMSG,reactionUl)
-      
-      imgs = [str(img) for img in imgs]   
-      reactions = [str(r.contents[0]) for r in reactions]     
+  def formatString(self,text):
+    return text.encode("latin_1").decode("utf_8")
 
-      #it is possible for a link to have a empty innerHTML -.- 
-      links = []
-      for link in aelements:
-        if len(link.contents)>0:
-          links.append(str(link.contents[0]))
-
-      message = {
-        'index':i,
-        'chatObj': self,
-        'chat':self.chatName,
-        'sender':sender,
-        'date':dateStamp,
-        'time':timeStamp,
-        'text':stringifyMSG,
-        'reactions':reactions,
-        'links':links,
-        'images':imgs,
-        'files':[], #coming in the future
-      }
-      #chat's message list
-      self.messages.append(message)
-      #persons own message list
-      self.people[sender].addMessage(message)
+  def extract_emojis(self,string):
+    return ''.join(c for c in string if c in emoji.UNICODE_EMOJI['en'])
 
   def readFile(self,file):
-    with open(file,'r',encoding='utf8') as infile:
-      text = infile.read()
-      self.soup = BeautifulSoup(text, 'html.parser')
-      #fetch chat name
-      self.fetchChatName(text)
-      #fetch people in chat
-      self.fetchPeopleInChat(text)
-      #fetch all messages
-      self.fetchAllMessages()
+    with open(file,'r', encoding='utf-8') as infile:
+      #keys: participants, messages, title, is_still_participant, 
+      #                   thread_type, thread_path, magic_words
+      data = json.load(infile)
+      self.chatName = self.formatString(data['title'])
+      self.fetchPeopleInChat(data['participants'])
+      self.fetchAllMessages(data['messages'])
     print(self)
 
   def countReactions(self):
@@ -119,9 +109,8 @@ class Chat():
         print(m['text'])
 
   def __str__(self):
-    return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.people)} people'
+    return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.participants)} people'
 
 if '__main__' == __name__:
   rcf = Chat()
-  rcf.readFile('tfn.html')
-    
+  rcf.readFile('tbs.json')

@@ -1,3 +1,6 @@
+import emoji
+
+
 class Person():
   def __init__(self,name):
     self.name = name
@@ -5,6 +8,7 @@ class Person():
     self.messages = []
     self.monthDict = {}
     self.timeDict = {}
+    self.totalEmojis = {}
     self.reactions = {}
     self.totalReactions = {}
     self.givenReactions = {}
@@ -26,6 +30,7 @@ class Person():
     self.countLinks += len(msg['links'])
     self.countImgs += len(msg['images'])
     self.countFiles += len(msg['files'])
+    self.emojisCounter(msg['emojis'])
     self.reactionCounter(msg['reactions'],msg['chatObj'])
 
   '''
@@ -33,6 +38,14 @@ class Person():
   Counter functions for words and reactions
   ***************************************
   '''
+  def emojisCounter(self,emojis):
+    for emoji in emojis:
+      if emoji in self.totalEmojis.keys():
+        self.totalEmojis[emoji] += 1
+      else:
+        self.totalEmojis[emoji] = 1
+
+
   def wordCounter(self,text):
     for letter in text:
       if letter not in self.allowedSigns:
@@ -46,16 +59,16 @@ class Person():
         self.words[word] += 1
 
   def reactionCounter(self,reactions,chat):
-    names = chat.getPeopleInChat()
+    '''
+    [{'reaction': 'ð\x9f\x91\x8d', 'actor': 'Alexander Skjetne'}]
+    '''
     if len(reactions) > 0:
-      for r in reactions:
-        for name in names:
-          if name in r:
-            r = r.replace(name,'').strip()
-            chat.people[name].addGivenReaction(self.name,r)
-            self.addReactionToName(name,r)
-        self.addTotalReaction(r)
-
+      for reaction in reactions:
+        name = reaction['actor']
+        emoji = reaction['reaction']
+        chat.participants[name].addGivenReaction(self.name,emoji)
+        self.addReactionToName(name,emoji)
+        self.addTotalReaction(emoji)
 
   '''
   ***************************************
@@ -77,12 +90,6 @@ class Person():
       self.totalReactions[r] += 1
     else:
       self.totalReactions[r] = 1
-
-
-  
-
-
-
   
   def addGivenReaction(self,name,r):
     self.addGivenReactionToName(name,r)
@@ -127,17 +134,33 @@ class Person():
     timeDict = {key:0 for key in range(24)}
     msgs = self.messages
     for msg in msgs:
-      h,m,s = msg['time'].split(':')
-      if '12' in h:
-        if 'pm' in s:
-          s = s.replace('p','a')
-        else:
-          s = s.replace('a','p')
-      h = int(h)
-      correction = int('pm' in s)*12
-      timeDict[(h+correction)%24] +=1
+      time = msg['time']
+      h = time.hour
+      timeDict[h] +=1
     return timeDict
   
+  def monthSendMessageDict(self):
+    '''
+    For all messages:
+      extract time
+      extract hour part for that time
+    
+    Args: 
+      None
+
+    Return:
+      dict
+        int key     : hour - 0 ... 23
+        int value   : number of times a msg was sent at that hour of the day
+    '''
+    monthDict = {key:0 for key in range(1,13)}
+    msgs = self.messages
+    for msg in msgs:
+      date = msg['date']
+      m = date.month
+      monthDict[m] +=1
+    return monthDict
+
   def dayOfWeekSendMessageDict(self):
     '''
     For all messages:
@@ -152,12 +175,6 @@ class Person():
         string key  : first three letter of a day
         int value   : number of times a msg was sent on that day
     '''
-
-    #dict for conversion between month name and number
-    mToInt = {'jan':1,'feb':2,'mar':3,
-              'apr':4,'mai':5,'may':5,'jun':6,
-              'jul':7,'aug':8,'sep':9,
-              'okt':10,'oct':10,'nov':11,'des':12,'dec':12}
     #counts different 
     data = {'Mon':0,
             'Tue':0,'Wed':0,
@@ -166,8 +183,8 @@ class Person():
     
     msgs = self.messages
     for msg in msgs:
-      d,m,y = msg['date'].split('.')
-      d,m,y = int(d),mToInt[m.strip()],int(y)
+      date = msg['date']
+      d,m,y = date.day,date.month,date.year
       data[self.dayOfWeek(d,m,y)] += 1
     return data
     

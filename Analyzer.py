@@ -1,5 +1,5 @@
-from PersonJSON import Person
-from ChatJSON import Chat
+from Person import Person
+from Chat import Chat
 from Grapher import Grapher
 import os
 
@@ -9,17 +9,23 @@ class Analyser():
     self.rcf.readFile(file)
     self.grapher = Grapher()
 
-  def plotDataInChat(self,func,fname,toSort=False,valueSort=True):
+  def plotDataInChat(self,func,fname,toSort=False,byValue=True):
     '''
     Creates a bar plot:
       X-axis: Data from func
       Y-axis: Frequency 
     
     Args:
-      None
+      function func   : the function needs to return dict data
+      string fname    : the filename with path for the output plot
+      boolean tosort  : if the data needs to be sorted
+      boolean byValue : true if sorting should be by value, false if by key
     
     Returns: 
-      None
+      dict data       : collected data from all the participants via the func function
+
+    Output: 
+      image in the chat directory
     '''
     chatName = self.rcf.chatName
     filename = f'{chatName}/{fname}'
@@ -34,21 +40,25 @@ class Analyser():
         else:
           data[key] = newData[key]
     if toSort:
-      data = self.sortDict(data,valueSort)
+      data = self.sortDict(data,byValue)
     self.grapher.makePlot(data,filename)
     return data
 
   def plotDataPerPerson(self,func,fname):
     '''
-    Creates a bar plot per person for emojis given:
-      X-axis: Emojis
+    Creates a bar plot:
+      X-axis: Data from func
       Y-axis: Frequency 
     
     Args:
-      None
+      function func   : the function needs to return dict data
+      string fname    : the filename with path for the output plot
     
     Returns: 
       None
+
+    Output: 
+      a image in each of the participant specific chat directory
     '''
     people = self.rcf.participants
     chatName = self.rcf.chatName
@@ -146,7 +156,7 @@ class Analyser():
       print('Given',sum(p.totalGivenReactions.values()),p.totalGivenReactions)
       summen += sum(p.totalReactions.values())
     print('\n\n\n')
-    print(self.totalReactionsInChat())
+    print(self.plotDataInChat(self.emojisGiven,'reactions-given',True))
 
   def fullAnalysisAndDataCreation(self):
     '''
@@ -159,12 +169,16 @@ class Analyser():
       None
     '''
     self.makeNecessaryDirs()
+    self.printBasicInfo()
+    #chat specific
     self.plotDataInChat(self.emojis,'emojis-used',True)
     self.plotDataInChat(self.emojisGiven,'reactions-given',True)
     self.plotDataInChat(self.emojisReceived,'reactions-recieved',True)
     self.plotDataInChat(self.dayOfWeek,'msg-per-day-of-the-week')
     self.plotDataInChat(self.sendTime,'msg-send-time')
     self.plotDataInChat(self.monthTime,'msg-per-month')
+    
+    #person specific
     self.plotDataPerPerson(self.emojis,'emojis-used')
     self.plotDataPerPerson(self.emojisGiven,'reactions-given')
     self.plotDataPerPerson(self.emojisReceived,'reactions-recieved')
