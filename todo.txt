@@ -12,6 +12,11 @@
   -timeline for emojis used over time
 
 advanced:
-  count emojis in the message text
+  Multiple plots are similar, should be possible to remove some functions or at least clean up the code
   multiple chats with multiple people at the same timeline
   single person chats
+
+
+
+done: 
+  count emojis in the message text - DONE
