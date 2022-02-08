@@ -1,6 +1,5 @@
-from calendar import formatstring
 import datetime,emoji,json
-from Person import Person
+from PersonJSON import Person
 
 class Chat():
   def __init__(self):
@@ -8,74 +7,86 @@ class Chat():
       self.chatName = ''
       self.messages = []
       self.reactionCount = -1
-      self.peopleC = '_2lek'
-      self.chatNameC = '_3b0d'
-      self.reactonUlTag = '_tqp'
-      self.msgDivC = '_3-96 _2let'
-      self.dateTimeC = '_3-94 _2lem'
-      self.senderC = '_3-96 _2pio _2lek _2lel'
-      self.msgContainer = 'pam _3-95 _2pi0 _2lej uiBoxWhite noborder'
 
   def getPeopleInChat(self):
     return list(self.people.keys())
 
   def fetchPeopleInChat(self,participants):
     for p in participants:
-      name = formatstring(p['name'])
+      name = self.formatString(p['name'])
       self.people[name] = Person(name)
+
+  def fetchContentInMessage(self,msg):
+    tag = 'content'
+    if tag in msg.keys():
+      content = self.formatString(msg[tag])
+      contentEmojis = self.extract_emojis(content)
+    else:
+      content = ''
+      contentEmojis = ''
+    return content,contentEmojis
+
+  def fetchReactionsInMessage(self,msg):
+    tag = 'reactions'
+    if tag in msg.keys():
+      for r in msg[tag]:
+        for key in r.keys():
+          r[key] = self.formatString(r[key])
+      return msg[tag]
+    else:
+      return []
+    
+  def fetchMediaInMessage(self,msg,tag):
+    return msg[tag] if tag in msg.keys() else []
+
+  def fetchTimeAndDateInMessage(self,msg):
+    ms = msg['timestamp_ms']
+    dt = datetime.datetime.fromtimestamp(ms/1000.0)
+    return dt.date(),dt.time()
 
   def fetchAllMessages(self,msgs):
     #creating data structure for each messages
-    for i in range(len(msgs)):
-      m = msgs[i]
-      dateStamp,timeStamp = m.find_all('div',{"class": self.dateTimeC})[0].contents[0].split(',')
-      
-      #quick fix for english version
-      year,timeStamp = timeStamp.strip().split(' ')
-      month,day = dateStamp.split(' ')
-      dateStamp = f'{day}.{month.lower()}.{year}'
-
-      #who sent and what did they send
-      sender = m.find_all('div',{"class": self.senderC})[0].contents[0]
-      messageText = m.find_all('div',{"class": self.msgDivC})[0].contents[0]
-      stringifyMSG = str(messageText).replace('<div>','').replace('</div>','')
-      
-      imgs = m.find_all('img')
-      reactions = m.find_all('li')
-      aelements = m.find_all('a')
-      reactionUl = m.find_all('ul',{"class":self.reactonUlTag})
-      stringifyMSG = self.removeFromString(stringifyMSG,aelements)
-      stringifyMSG = self.removeFromString(stringifyMSG,reactionUl)
-      
-      imgs = [str(img) for img in imgs]   
-      reactions = [str(r.contents[0]) for r in reactions]     
-
-      #it is possible for a link to have a empty innerHTML -.- 
-      links = []
-      for link in aelements:
-        if len(link.contents)>0:
-          links.append(str(link.contents[0]))
-
-      message = {
-        'index':i,
-        'chatObj': self,
-        'chat':self.chatName,
-        'sender':sender,
-        'date':dateStamp,
-        'time':timeStamp,
-        'text':stringifyMSG,
-        'reactions':reactions,
-        'links':links,
-        'images':imgs,
-        'files':[], #coming in the future
-      }
-      #chat's message list
-      self.messages.append(message)
-      #persons own message list
-      self.people[sender].addMessage(message)
+    i = 0
+    for msg in msgs:
+      if not msg['is_unsent']:
+        i += 1
+        date,time = self.fetchTimeAndDateInMessage(msg)
+        sender = self.formatString(msg['sender_name'])
+        photos = self.fetchMediaInMessage(msg,'photos')
+        gifs = self.fetchMediaInMessage(msg,'gifs')
+        sticker = self.fetchMediaInMessage(msg,'sticker')
+        videos = self.fetchMediaInMessage(msg,'videos')
+        files = self.fetchMediaInMessage(msg,'files')
+        reactions = self.fetchReactionsInMessage(msg)
+        content,contentEmojis = self.fetchContentInMessage(msg)  
+        links = []
+        message = {
+          'index':i,
+          'chatObj': self,
+          'chat':self.chatName,
+          'sender':sender,
+          'date':date,
+          'time':time,
+          'text':content,
+          'emojis':contentEmojis,
+          'reactions':reactions,
+          'images':photos,
+          'videos':videos,
+          'gifs':gifs,
+          'sticker':sticker,
+          'files':files, #came in the future :)
+          'links':links, #coming in the future
+        }
+        #chat's message list
+        self.messages.append(message)
+        #persons own message list
+        self.people[sender].addMessage(message)
 
   def formatString(self,text):
     return text.encode("latin_1").decode("utf_8")
+
+  def extract_emojis(self,string):
+    return ''.join(c for c in string if c in emoji.UNICODE_EMOJI['en'])
 
   def readFile(self,file):
     with open(file,'r', encoding='utf-8') as infile:
@@ -105,5 +116,5 @@ class Chat():
 
 if '__main__' == __name__:
   rcf = Chat()
-  rcf.readFile('tfn.html')
+  rcf.readFile('tbs.json')
     
