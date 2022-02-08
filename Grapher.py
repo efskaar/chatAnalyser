@@ -1,33 +1,39 @@
 from matplotlib.pyplot import * 
 import matplotlib
 
-# backends =  ['GTK3Agg', 'GTK3Cairo', 'MacOSX', 'nbAgg', 'Qt4Agg', 'Qt4Cairo',
-#   'Qt5Agg', 'Qt5Cairo', 'TkAgg', 'TkCairo', 'WebAgg', 'WX', 'WXAgg',
-#    'WXCairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
-
-#makes emojis render proberly
-
-
-
 class Grapher():
   def __init__(self,filetype='png'):
       self.dpi = 55
       self.backend = {'png':'Agg','svg':'svg'}
       self.filetype = filetype
       matplotlib.use(self.backend[filetype])
+      #makes emojis render proberly
       matplotlib.rcParams['font.size'] = 15
       matplotlib.rcParams["font.monospace"] = ["DejaVu Sans Mono"]
       matplotlib.rcParams["font.family"] = "monospace"
-      self.goodColors = ['#e6194B','#3cb44b','#ffe119','#4363d8','#f58231', 
-                          '#42d4f4','#f032e6','#fabed4','#469990','#dcbeff',
-                          '#9A6324','#fffac8','#800000','#aaffc3','#000075', 
-                          '#a9a9a9']
+      self.goodColors = ['#e6194B','#3cb44b','#FFC107','#4363d8','#42d4f4',
+                          '#f032e6','#795548']
   
-  def makePlot(self,dict,filename,path=''):
-    maxValue = max(dict.values())
-    length = len(dict.keys())
+  def makePlot(self,dData,filename,path=''):
+    '''
+    Makes a bar plot of dictionary data
+    7 Colors are repeated and there is no background for the images
+
+    Args:
+      dict dData      : a dictionary with number values
+      string filename : can include path in this variable 
+      Optional:
+        string path : can separately add path
+    Returns:
+      None
+    
+    Output:
+      image file at given path
+    '''
+    maxValue = max(dData.values())
+    length = len(dData.keys())
     colorLen = len(self.goodColors)
-    keys = list(dict.keys())
+    keys = list(dData.keys())
     w = 3 #width
 
     #make it pretty, kinda
@@ -42,7 +48,7 @@ class Grapher():
     #making the bars and labels
     for i in range(length):
       key = keys[i]
-      value = dict[key]
+      value = dData[key]
       xStart = ((1+i)*w)-1
       yStart = 0
       xEnd = ((1+i)*w) 
