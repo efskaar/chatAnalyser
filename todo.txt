@@ -1,5 +1,3 @@
--month bar plot for whole chat
--month bar plot per person
 -month bar plot per person per year
 -year bar plot per person
 -year bar plot whole chat
