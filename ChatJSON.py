@@ -3,18 +3,21 @@ from PersonJSON import Person
 
 class Chat():
   def __init__(self):
-      self.people = {}
+      self.participants = {}
       self.chatName = ''
       self.messages = []
       self.reactionCount = -1
 
   def getPeopleInChat(self):
-    return list(self.people.keys())
+    '''
+    Makes a list of the names of the participants in the Chat
+    '''
+    return list(self.participants.keys())
 
   def fetchPeopleInChat(self,participants):
     for p in participants:
       name = self.formatString(p['name'])
-      self.people[name] = Person(name)
+      self.participants[name] = Person(name)
 
   def fetchContentInMessage(self,msg):
     tag = 'content'
@@ -80,7 +83,7 @@ class Chat():
         #chat's message list
         self.messages.append(message)
         #persons own message list
-        self.people[sender].addMessage(message)
+        self.participants[sender].addMessage(message)
 
   def formatString(self,text):
     return text.encode("latin_1").decode("utf_8")
@@ -112,7 +115,7 @@ class Chat():
         print(m['text'])
 
   def __str__(self):
-    return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.people)} people'
+    return f'{self.chatName} consists of:\n{len(self.messages)} messages\n{self.countReactions()} reactions\n{len(self.participants)} people'
 
 if '__main__' == __name__:
   rcf = Chat()
