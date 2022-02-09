@@ -4,7 +4,10 @@
 -timeline for the chat
   -timeline for messages
   -timeline for words
-  
+find words
+find phrases
+
+
 -timeline per person:
   -timeline for popular words
   -timeline for emojis used over time
