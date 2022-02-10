@@ -187,5 +187,5 @@ class Analyser():
     self.plotDataPerPerson(self.monthTime,'msg-per-month')
 
 if '__main__' == __name__:
-  analyzer = Analyser('tbs.json')
+  analyzer = Analyser('tfn.json')
   analyzer.fullAnalysisAndDataCreation()

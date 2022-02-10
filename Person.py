@@ -22,10 +22,29 @@ class Person():
     return self.name
   
   def addMessage(self,message):
+    '''
+    adds a message to the class and properly counts its properties
+    
+    Args:
+      dict message  : dict containing all the data for the message
+    
+    Returns:
+      None
+    '''
     self.messages.append(message)
     self.analyseMessage(message)
 
   def analyseMessage(self,msg):
+    '''
+    counts the different properties of a msg and adds it to the person
+    The reactions to the msg is sent of to the person that has given to reaction
+
+    Args:
+      dict msg  : containing all the properties for the msg
+    
+    Returns:
+      None
+    '''
     self.wordCounter(msg['text'])
     self.countLinks += len(msg['links'])
     self.countImgs += len(msg['images'])
@@ -33,12 +52,17 @@ class Person():
     self.emojisCounter(msg['emojis'])
     self.reactionCounter(msg['reactions'],msg['chatObj'])
 
-  '''
-  ***************************************
-  Counter functions for words and reactions
-  ***************************************
-  '''
   def emojisCounter(self,emojis):
+    '''
+    counts emojis in a list of emojis
+    creates a new key in totalEmojis if necessary
+
+    Args:
+      list emojis   : a list of the emojis in the msg
+
+    Returns: 
+      None
+    '''
     for emoji in emojis:
       if emoji in self.totalEmojis.keys():
         self.totalEmojis[emoji] += 1
@@ -47,6 +71,16 @@ class Person():
 
 
   def wordCounter(self,text):
+    '''
+    counts words in a string and adds them to the words dict
+    removes any signs that are not letters, numbers or space
+
+    Args:
+      string emojis   : a list of the emojis in the msg
+
+    Returns: 
+      None
+    '''
     for letter in text:
       if letter not in self.allowedSigns:
         text = text.replace(letter,' ')
@@ -60,7 +94,16 @@ class Person():
 
   def reactionCounter(self,reactions,chat):
     '''
-    [{'reaction': 'ð\x9f\x91\x8d', 'actor': 'Alexander Skjetne'}]
+    adds the reations to a dictionary of participants and emojis
+    sends the given reaction of to the sender of that reaction
+    adds the reactions to the total reactions
+
+    Args: 
+      list reactions  : list containing reactions from the JSON file
+      string chat     : the name of the chat
+    
+    Returns: 
+      None
     '''
     if len(reactions) > 0:
       for reaction in reactions:
@@ -70,12 +113,17 @@ class Person():
         self.addReactionToName(name,emoji)
         self.addTotalReaction(emoji)
 
-  '''
-  ***************************************
-  helper functions for reactions counting
-  ***************************************
-  '''
   def addReactionToName(self,name,r):
+    '''
+    Inserts the reaction into the reactions dictionary for each participants
+
+    Args:
+      string name   : name of the participant
+      string r      : the emoji for the reaction
+    
+    Returns:
+      None
+    '''
     if name in self.reactions.keys():
       if r in self.reactions[name].keys():
         self.reactions[name][r] += 1
@@ -86,6 +134,15 @@ class Person():
       self.reactions[name][r] = 1
   
   def addTotalReaction(self,r):
+    '''
+    Inserts the reaction into the reactions dictionary in total
+
+    Args:
+      string r      : the emoji for the reaction
+    
+    Returns:
+      None
+    '''
     if r in self.totalReactions.keys():
       self.totalReactions[r] += 1
     else:
@@ -94,14 +151,18 @@ class Person():
   def addGivenReaction(self,name,r):
     self.addGivenReactionToName(name,r)
     self.addTotalGivenReaction(r)
-  
-  '''
-  ***************************************
-  helper functions for reactions given counting
-  ***************************************
-  '''
 
   def addGivenReactionToName(self,name,r):
+    '''
+    Inserts the reaction into the reactions given dictionary to each participants
+
+    Args:
+      string name   : name of the participant
+      string r      : the emoji for the reaction
+    
+    Returns:
+      None
+    '''
     if name in self.givenReactions.keys():
       if r in self.givenReactions[name].keys():
         self.givenReactions[name][r] += 1
@@ -112,6 +173,15 @@ class Person():
       self.givenReactions[name][r] = 1
   
   def addTotalGivenReaction(self,r):
+    '''
+    Inserts the reaction into the reactions given dictionary in total
+
+    Args:
+      string r      : the emoji for the reaction
+    
+    Returns:
+      None
+    '''
     if r in self.totalGivenReactions.keys():
       self.totalGivenReactions[r] += 1
     else:
@@ -175,7 +245,6 @@ class Person():
         string key  : first three letter of a day
         int value   : number of times a msg was sent on that day
     '''
-    #counts different 
     data = {'Mon':0,
             'Tue':0,'Wed':0,
             'Thu':0,'Fri':0,
