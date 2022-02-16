@@ -13,8 +13,7 @@
     * **Grapher** will be updated with further functionality in the future 
 
 # Dependencies:
-  **beautifulSoup** only for the HTML parser version
-  json
-  emoji
-  datetime
-  matplotlib
+  * **json**
+  * **emoji**
+  * **datetime**
+  * **matplotlib**
